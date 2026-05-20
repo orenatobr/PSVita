@@ -1,0 +1,94 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "mark-completed -- dry-run",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "psvita.mark_completed",
+            "args": ["${input:titleId}", "--dry-run"],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "mark-completed -- apply + upload",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "psvita.mark_completed",
+            "args": ["${input:titleId}"],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "reorder-livearea -- dry-run",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "psvita.reorder_livearea",
+            "args": ["--dry-run"],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "reorder-livearea -- apply + upload",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "psvita.reorder_livearea",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "sync-app -- dry-run",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/sync-app",
+            "args": ["--dry-run"],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "sync-app -- apply",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/sync-app",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "sync-psp -- dry-run",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/sync-psp",
+            "args": ["--dry-run"],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "sync-psp -- apply",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/sync-psp",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "pytest -- full suite",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["-v"],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "titleId",
+            "type": "promptString",
+            "description": "PS Vita title ID (e.g. PCSA00029)",
+            "default": "PCSA00029"
+        }
+    ]
+}

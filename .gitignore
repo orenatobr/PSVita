@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+._*
+.AppleDouble
+.Spotlight-V100
+.fseventsd
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+dist/
+build/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Runtime artifacts
+app.db
+app.db.bak
+*_icon0_modified.png
+
+# Game data (binary assets, not tracked in VCS)
+app/PCS*/
+pspemu/ISO/*.iso
+originals/*.png
+app.db.vita
+app.db.check
+app.db.bak.before_restore
+pspemu/games.md
+app/games.md
