@@ -34,6 +34,7 @@ reorder:
   # Games ordered alphabetically (articles ignored), series grouped by release.
   game_order:
     - PCSE00700   # AC Chronicles (Assassin's Creed Chronicles)
+    - PCSE00905   # Adventures of Mana
     - PCSE00790   # Bastion
     - PCSE00480   # Child of Light
     - PCSE01232   # CosmicStarHeroine
@@ -51,8 +52,6 @@ reorder:
     - PCSE00896   # Trails of Cold Steel II                 [ToCS #2]
     - PCSA00017   # LittleBigPlanet
     - PCSA00133   # Ratchet & Clank Collection
-    - PCSE00052   # Rayman Origins                          [Rayman #1]
-    - PCSE00277   # Rayman Legends                          [Rayman #2]
     - PCSA00063   # Resistance: Burning Skies
     - PCSE00449   # Rogue Legacy
     - PCSE01337   # Romancing SaGa 3
@@ -65,6 +64,7 @@ reorder:
     - PCSA00152   # Soul Sacrifice Delta
     - PCSA00144   # Tearaway
     - PCSE00317   # Terraria
+    - PCSE01153   # Secret of Mana
     - PCSA00029   # Uncharted: Golden Abyss
     - PCSE00880   # World of Final Fantasy
     - PCSE01033   # Ys Origin                               [Ys prequel]
