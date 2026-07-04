@@ -167,7 +167,7 @@ def main() -> None:
     offset, length = iso9660.find_icon0(iso)
     print(f"ICON0.PNG at byte offset {offset}, region length {length} bytes")
 
-    cfg.paths.originals_dir.mkdir(exist_ok=True)
+    cfg.paths.originals_dir.mkdir(parents=True, exist_ok=True)
     backup = cfg.paths.originals_dir / f"{iso.stem}_ICON0.png"
     _ensure_original(backup, iso, offset, length)
 
