@@ -33,6 +33,28 @@ uv run mark-completed PCSA00029
 
 After upload: VitaShell > Triangle > Refresh livearea. If the icon does not update, power the Vita off completely and back on.
 
+### Mark a PSP game as completed (Adrenaline)
+
+PSP games launched from Adrenaline's menu read their icon from `PSP_GAME/ICON0.PNG`
+**inside** each ISO, and VitaShell's FTP server cannot patch a file in place. So this
+badges the icon in the **local** ISO (in place, same byte size) and re-uploads the whole
+image — expect a full-ISO transfer (~1–1.6 GB) per game. Identify the game by its ISO
+filename or a unique substring.
+
+```bash
+# Preview only — writes a preview PNG, leaves the ISO untouched, no upload
+uv run mark-completed-psp "Crisis Core" --dry-run
+
+# Patch the local ISO but don't upload (push later with the PSP sync below)
+uv run mark-completed-psp "Crisis Core" --local-only
+
+# Patch the local ISO and upload the whole image over FTP
+uv run mark-completed-psp "Crisis Core"
+```
+
+After upload: on the Vita, re-enter Adrenaline's game menu (or reboot Adrenaline) so the
+PSP XMB re-reads the icon.
+
 ### Reorder the LiveArea
 
 Reorders LiveArea pages by rewriting `app.db` on the device.

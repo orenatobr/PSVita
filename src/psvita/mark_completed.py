@@ -31,7 +31,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 import psvita.ftp as ftp
-from psvita.config import get_config
+from psvita.config import BadgeConfig, get_config
 
 
 def _remote_url(title_id: str) -> str:
@@ -115,16 +115,19 @@ def _ensure_original(title_id: str, backup: Path, remote_url: str) -> None:
         print(f"Original saved to {backup}")
 
 
-def apply_badge(img: Image.Image) -> Image.Image:
+def apply_badge(img: Image.Image, badge: BadgeConfig | None = None) -> Image.Image:
     """Return a copy of img with a green checkmark badge in the top-right corner.
 
     Args:
         img: Source icon image. Any mode is accepted; output is RGB.
+        badge: Badge geometry/colours to draw. Defaults to the Vita ``badge``
+            config; the PSP tool passes its own ``psp_badge`` for the 144x80 icon.
 
     Returns:
         New RGB image with the badge composited on top of the source icon.
     """
-    badge = get_config().badge
+    if badge is None:
+        badge = get_config().badge
     out = img.convert("RGB")
     draw = ImageDraw.Draw(out)
 
