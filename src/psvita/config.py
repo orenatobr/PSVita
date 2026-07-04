@@ -105,8 +105,10 @@ def _parse_badge(badge_raw: Any) -> BadgeConfig:
         KeyError: If a required badge key is missing (caught by the caller and
             re-raised as a ValueError naming the key).
     """
-    fill_raw: list[int] = badge_raw["fill"]
-    check_raw: list[int] = badge_raw["check_color"]
+    fill_raw = list(badge_raw["fill"])
+    check_raw = list(badge_raw["check_color"])
+    if len(fill_raw) != 3 or len(check_raw) != 3:
+        raise ValueError("fill and check_color must be 3-item RGB lists")
     return BadgeConfig(
         cx=int(badge_raw["cx"]),
         cy=int(badge_raw["cy"]),
