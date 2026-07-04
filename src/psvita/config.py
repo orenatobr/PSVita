@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -85,8 +86,35 @@ class Config:
     vita: VitaConfig
     paths: PathsConfig
     badge: BadgeConfig
+    psp_badge: BadgeConfig
     reorder: ReorderConfig
     sync: SyncConfig
+
+
+def _parse_badge(badge_raw: Any) -> BadgeConfig:
+    """Build a BadgeConfig from a raw YAML ``badge`` mapping.
+
+    Args:
+        badge_raw: Mapping with ``cx``, ``cy``, ``radius``, ``fill`` (3-list),
+            ``check_color`` (3-list), and ``check_width`` keys.
+
+    Returns:
+        A populated BadgeConfig with ``fill``/``check_color`` coerced to 3-tuples.
+
+    Raises:
+        KeyError: If a required badge key is missing (caught by the caller and
+            re-raised as a ValueError naming the key).
+    """
+    fill_raw: list[int] = badge_raw["fill"]
+    check_raw: list[int] = badge_raw["check_color"]
+    return BadgeConfig(
+        cx=int(badge_raw["cx"]),
+        cy=int(badge_raw["cy"]),
+        radius=int(badge_raw["radius"]),
+        fill=(fill_raw[0], fill_raw[1], fill_raw[2]),
+        check_color=(check_raw[0], check_raw[1], check_raw[2]),
+        check_width=int(badge_raw["check_width"]),
+    )
 
 
 def _load(path: Path) -> Config:
@@ -108,12 +136,13 @@ def _load(path: Path) -> Config:
         vita_raw = raw["vita"]
         paths_raw = raw["paths"]
         badge_raw = raw["badge"]
+        psp_badge_raw = raw["psp_badge"]
         reorder_raw = raw["reorder"]
         sync_raw = raw["sync"]
         excludes_raw = sync_raw["excludes"]
 
-        fill_raw: list[int] = badge_raw["fill"]
-        check_raw: list[int] = badge_raw["check_color"]
+        badge = _parse_badge(badge_raw)
+        psp_badge = _parse_badge(psp_badge_raw)
     except KeyError as exc:
         raise ValueError(f"Missing required configuration key: {exc}") from exc
 
@@ -129,14 +158,8 @@ def _load(path: Path) -> Config:
             psp_local=Path(paths_raw["psp_local"]),
             originals_dir=Path(paths_raw["originals_dir"]),
         ),
-        badge=BadgeConfig(
-            cx=int(badge_raw["cx"]),
-            cy=int(badge_raw["cy"]),
-            radius=int(badge_raw["radius"]),
-            fill=(fill_raw[0], fill_raw[1], fill_raw[2]),
-            check_color=(check_raw[0], check_raw[1], check_raw[2]),
-            check_width=int(badge_raw["check_width"]),
-        ),
+        badge=badge,
+        psp_badge=psp_badge,
         reorder=ReorderConfig(
             items_per_page=int(reorder_raw["items_per_page"]),
             default_title_id=str(reorder_raw["default_title_id"]),

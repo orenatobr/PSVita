@@ -10,6 +10,7 @@ dependencies = [
 
 [project.scripts]
 mark-completed = "psvita.mark_completed:main"
+mark-completed-psp = "psp.mark_completed:main"
 reorder-livearea = "psvita.reorder_livearea:main"
 sync-app = "psvita.sync:main_app"
 sync-psp = "psvita.sync:main_psp"
@@ -28,14 +29,14 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/psvita"]
+packages = ["src/psvita", "src/psp"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=src/psvita --cov-report=term-missing --cov-fail-under=100"
+addopts = "--cov=src/psvita --cov=src/psp --cov-report=term-missing --cov-fail-under=100"
 
 [tool.coverage.run]
-source = ["src/psvita"]
+source = ["src/psvita", "src/psp"]
 branch = true
 
 [tool.coverage.report]

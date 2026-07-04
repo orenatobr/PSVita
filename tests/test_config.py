@@ -29,6 +29,14 @@ badge:
   check_color: [255, 254, 253]
   check_width: 1
 
+psp_badge:
+  cx: 40
+  cy: 12
+  radius: 9
+  fill: [1, 2, 3]
+  check_color: [4, 5, 6]
+  check_width: 3
+
 reorder:
   items_per_page: 5
   default_title_id: "PCSA00001"
@@ -98,6 +106,20 @@ def test_load_badge_fields(tmp_path: Path) -> None:
     assert cfg.badge.fill == (10, 20, 30)
     assert cfg.badge.check_color == (255, 254, 253)
     assert cfg.badge.check_width == 1
+
+
+def test_load_psp_badge_fields(tmp_path: Path) -> None:
+    yaml_file = tmp_path / "config.yaml"
+    yaml_file.write_text(_MINIMAL_YAML, encoding="utf-8")
+
+    cfg = _load(yaml_file)
+
+    assert cfg.psp_badge.cx == 40
+    assert cfg.psp_badge.cy == 12
+    assert cfg.psp_badge.radius == 9
+    assert cfg.psp_badge.fill == (1, 2, 3)
+    assert cfg.psp_badge.check_color == (4, 5, 6)
+    assert cfg.psp_badge.check_width == 3
 
 
 def test_load_reorder_fields(tmp_path: Path) -> None:

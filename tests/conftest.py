@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 import sqlite3
 from pathlib import Path
 
@@ -31,6 +32,102 @@ def sample_icon() -> Image.Image:
 
 
 # ---------------------------------------------------------------------------
+# Synthetic PSP ISO fixtures
+# ---------------------------------------------------------------------------
+
+_ISO_SECTOR = 2048
+
+
+def _iso_dir_record(name: bytes, lba: int, length: int, *, is_dir: bool) -> bytes:
+    """Build one ISO9660 Directory Record (both-endian LBA/length fields)."""
+    name_len = len(name)
+    record_len = 33 + name_len
+    if record_len % 2:
+        record_len += 1  # records are padded to an even length
+    record = bytearray(record_len)
+    record[0] = record_len
+    record[2:6] = lba.to_bytes(4, "little")
+    record[6:10] = lba.to_bytes(4, "big")
+    record[10:14] = length.to_bytes(4, "little")
+    record[14:18] = length.to_bytes(4, "big")
+    record[25] = 0x02 if is_dir else 0x00
+    record[28:30] = (1).to_bytes(2, "little")
+    record[30:32] = (1).to_bytes(2, "big")
+    record[32] = name_len
+    record[33 : 33 + name_len] = name
+    return bytes(record)
+
+
+@pytest.fixture()
+def real_icon_png() -> bytes:
+    """Return PNG bytes of a 144x80 gradient icon (compressible, PSP ICON0 sized)."""
+    img = Image.new("RGB", (144, 80))
+    pixels = img.load()
+    assert pixels is not None
+    for y in range(80):
+        for x in range(144):
+            pixels[x, y] = (x % 256, (x * y) % 256, y % 256)
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
+@pytest.fixture()
+def make_psp_iso() -> object:
+    """Return a builder that writes a minimal PSP ISO and returns its path.
+
+    Signature: ``make(path, icon_png, *, with_psp_game=True, with_icon=True)``.
+    Layout: system area (16 sectors), PVD (16), root dir (17), PSP_GAME dir (18,
+    containing USRDIR + ICON0.PNG), icon data (19+). The icon's byte offset is
+    therefore ``19 * 2048``.
+    """
+
+    def _build(
+        path: Path,
+        icon_png: bytes,
+        *,
+        with_psp_game: bool = True,
+        with_icon: bool = True,
+    ) -> Path:
+        pvd = bytearray(_ISO_SECTOR)
+        pvd[0] = 1
+        pvd[1:6] = b"CD001"
+        pvd[6] = 1
+        root_record = _iso_dir_record(b"\x00", 17, _ISO_SECTOR, is_dir=True)
+        pvd[156 : 156 + len(root_record)] = root_record
+
+        root = bytearray()
+        root += _iso_dir_record(b"\x00", 17, _ISO_SECTOR, is_dir=True)
+        root += _iso_dir_record(b"\x01", 17, _ISO_SECTOR, is_dir=True)
+        if with_psp_game:
+            root += _iso_dir_record(b"PSP_GAME", 18, _ISO_SECTOR, is_dir=True)
+        root = root.ljust(_ISO_SECTOR, b"\x00")
+
+        psp_game = bytearray()
+        psp_game += _iso_dir_record(b"\x00", 18, _ISO_SECTOR, is_dir=True)
+        psp_game += _iso_dir_record(b"\x01", 17, _ISO_SECTOR, is_dir=True)
+        # A subdirectory before the icon: exercises the file/dir mismatch branch.
+        psp_game += _iso_dir_record(b"USRDIR", 20, _ISO_SECTOR, is_dir=True)
+        if with_icon:
+            psp_game += _iso_dir_record(b"ICON0.PNG;1", 19, len(icon_png), is_dir=False)
+        psp_game = psp_game.ljust(_ISO_SECTOR, b"\x00")
+
+        icon_sectors = ((len(icon_png) + _ISO_SECTOR - 1) // _ISO_SECTOR) or 1
+        icon_data = icon_png.ljust(icon_sectors * _ISO_SECTOR, b"\x00")
+
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("wb") as fp:
+            fp.write(b"\x00" * (16 * _ISO_SECTOR))
+            fp.write(pvd)
+            fp.write(root)
+            fp.write(psp_game)
+            fp.write(icon_data)
+        return path
+
+    return _build
+
+
+# ---------------------------------------------------------------------------
 # Config fixtures
 # ---------------------------------------------------------------------------
 
@@ -50,6 +147,14 @@ def vita_config() -> Config:
         badge=BadgeConfig(
             cx=64,
             cy=64,
+            radius=13,
+            fill=(34, 197, 94),
+            check_color=(255, 255, 255),
+            check_width=2,
+        ),
+        psp_badge=BadgeConfig(
+            cx=126,
+            cy=18,
             radius=13,
             fill=(34, 197, 94),
             check_color=(255, 255, 255),
