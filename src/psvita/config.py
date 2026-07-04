@@ -136,7 +136,7 @@ def _load(path: Path) -> Config:
         vita_raw = raw["vita"]
         paths_raw = raw["paths"]
         badge_raw = raw["badge"]
-        psp_badge_raw = raw["psp_badge"]
+        psp_badge_raw = raw.get("psp_badge", badge_raw)
         reorder_raw = raw["reorder"]
         sync_raw = raw["sync"]
         excludes_raw = sync_raw["excludes"]
