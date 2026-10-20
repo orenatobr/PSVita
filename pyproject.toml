@@ -52,6 +52,8 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.mypy]
 strict = true
 python_version = "3.12"
+cache_dir = "~/.cache/mypy"
+exclude = ["^app/", "^pspemu/", "^originals/", "^\\.venv/"]
 
 [[tool.mypy.overrides]]
 module = "yaml"
