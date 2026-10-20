@@ -45,41 +45,49 @@ reorder:
   game_order:
     - PCSE00700   # AC Chronicles (Assassin's Creed Chronicles)
     - PCSE00905   # Adventures of Mana
-    - PCSE00790   # Bastion
-    - PCSE00480   # Child of Light
-    - PCSE01232   # CosmicStarHeroine
-    - PCSE01171   # Digimon Story: Cyber Sleuth - Hacker's Memory
-    - PCSE00293   # Final Fantasy X HD Remaster             [FF #1]
-    - PCSE00283   # Final Fantasy X-2 HD Remaster           [FF #2]
-    - PCSA00126   # God of War Collection
+    - PCSE00006   # Army Corps of Hell
+    - PCSE00053   # Assassin's Creed III Liberation
+    - PCSE00261   # Danganronpa: Trigger Happy Havoc                [Danganronpa #1]
+    - PCSE00399   # Danganronpa 2: Goodbye Despair                  [Danganronpa #2]
+    - PCSA00106   # Destiny of Spirits
+    - PCSE00755   # Digimon Story: Cyber Sleuth
+    - PCSE00124   # Dokuro
+    - PCSE00014   # Dynasty Warriors Next
+    - PCSA00004   # Escape Plan
+    - PCSA00147   # Freedom Wars
     - PCSA00011   # Gravity Rush
-    - PCSE00547   # Grim Fandango Remastered
-    - PCSE00033   # Guacamelee!
-    - PCSA00080   # Jak and Daxter Collection
-    - PCSE00088   # Jet Set Radio
+    - PCSE00326   # Hatsune Miku: Project DIVA f
+    - PCSA00009   # Hot Shots Golf: World Invitational
+    - PCSE00443   # Hyperdimension Neptunia Re;Birth1          [Neptunia #1]
+    - PCSE00508   # Hyperdimension Neptunia Re;Birth2          [Neptunia #2]
+    - PCSE00661   # Hyperdimension Neptunia Re;Birth3          [Neptunia #3]
     - PCSA00107   # Killzone Mercenary
-    - PCSE00786   # Trails of Cold Steel                    [ToCS #1]
-    - PCSE00896   # Trails of Cold Steel II                 [ToCS #2]
+    - PCSA00010   # Little Deviants
     - PCSA00017   # LittleBigPlanet
-    - PCSA00133   # Ratchet & Clank Collection
+    - PCSE00397   # Llamasoft TxK
+    - PCSE00009   # Lumines Electronic Symphony
+    - PCSE00359   # MIND≒0
+    - PCSA00001   # ModNation Racers: Road Trip
+    - PCSE00240   # Muramasa Rebirth
+    - PCSA00155   # Oreshika: Tainted Bloodlines
+    - PCSE00120   # Persona 4 Golden                            [Persona 4 #1]
+    - PCSE00764   # Persona 4: Dancing All Night                [Persona 4 #2]
+    - PCSA00139   # PlayStation Vita Pets
+    - PCSE00300   # Ragnarok Odyssey ACE
+    - PCSA00012   # Reality Fighters
     - PCSA00063   # Resistance: Burning Skies
-    - PCSE00449   # Rogue Legacy
-    - PCSE01337   # Romancing SaGa 3
-    - PCSE00950   # Shantae: Half-Genie Hero
-    - PCSE00640   # Shovel Knight
-    - PCSA00096   # Sly 1: Thievius Raccoonus               [Sly #1]
-    - PCSA00097   # Sly 2: Band of Thieves                  [Sly #2]
-    - PCSA00098   # Sly 3: Honor Among Thieves              [Sly #3]
-    - PCSA00068   # Sly 4: Thieves in Time                  [Sly #4]
+    - PCSE01153   # Secret of Mana
+    - PCSE00015   # Shinobido 2: Revenge of Zen
+    - PCSE00314   # Sorcery Saga: Curse of the Great Curry God
     - PCSA00152   # Soul Sacrifice Delta
+    - PCSA00006   # Super Stardust Delta
+    - PCSE00465   # Sword Art Online: Hollow Fragment
     - PCSA00144   # Tearaway
     - PCSE00317   # Terraria
-    - PCSE01153   # Secret of Mana
     - PCSA00029   # Uncharted: Golden Abyss
-    - PCSE00880   # World of Final Fantasy
-    - PCSE01033   # Ys Origin                               [Ys prequel]
-    - PCSE00245   # Ys: Memories of Celceta                 [Ys #2]
-    - PCSE01103   # Ys VIII - Lacrimosa of DANA             [Ys #3]
+    - PCSA00014   # Unit 13
+    - PCSA00015   # WipEout 2048
+    - PCSE00245   # Ys: Memories of Celceta
 
 sync:
   app_remote: "/ux0:/app/"
