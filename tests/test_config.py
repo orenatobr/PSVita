@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 import psvita.config as config_mod
-from psvita.config import Config, _load, get_config, reset_config
+from psvita.config import Config, _load, _parse_badge, get_config, reset_config
 
 _MINIMAL_YAML = """\
 vita:
@@ -120,6 +120,12 @@ def test_load_psp_badge_fields(tmp_path: Path) -> None:
     assert cfg.psp_badge.fill == (1, 2, 3)
     assert cfg.psp_badge.check_color == (4, 5, 6)
     assert cfg.psp_badge.check_width == 3
+
+
+def test_parse_badge_rejects_non_rgb_list() -> None:
+    badge = {"cx": 1, "cy": 1, "radius": 1, "fill": [1, 2], "check_color": [1, 2, 3], "check_width": 1}
+    with pytest.raises(ValueError, match="3-item RGB"):
+        _parse_badge(badge)
 
 
 def test_load_reorder_fields(tmp_path: Path) -> None:
