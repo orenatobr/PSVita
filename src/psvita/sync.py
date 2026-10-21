@@ -49,7 +49,8 @@ def _lftp_script(
         mirror_flags.append("--dry-run")
     for pattern in excludes:
         mirror_flags += ["--exclude", pattern]
-    mirror_flags += [str(local.resolve()), remote]
+    # A trailing slash makes lftp append the source basename (ISO/ISO), so strip it.
+    mirror_flags += [str(local.resolve()), remote.rstrip("/")]
 
     parts.append(" ".join(mirror_flags))
     parts.append("quit")

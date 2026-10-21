@@ -47,8 +47,8 @@ class TestLftpScript:
             assert pattern in script
         # Path is resolved to absolute.
         assert str(local.resolve()) in script
-        # Remote path is present.
-        assert apply_config.sync.app_remote in script
+        # Remote path is present, without the trailing slash.
+        assert apply_config.sync.app_remote.rstrip("/") in script
         # All 8 settings lines are present.
         for setting in apply_config.sync.lftp_settings:
             assert setting in script
@@ -62,6 +62,13 @@ class TestLftpScript:
         script = s._lftp_script(local, apply_config.sync.app_remote, excludes=app_excludes, delete=False, dry_run=True)
 
         assert "--dry-run" in script
+
+    def test_remote_trailing_slash_is_stripped(self, tmp_path: Path) -> None:
+        """A trailing slash would make lftp mirror into <remote>/<basename>, e.g. ISO/ISO."""
+        script = s._lftp_script(tmp_path / "ISO", "/ux0:/pspemu/ISO/", excludes=[], delete=True, dry_run=False)
+
+        mirror = next(part for part in script.split("; ") if part.startswith("mirror"))
+        assert mirror.endswith(" /ux0:/pspemu/ISO")
 
     def test_psp_script_with_delete(self, tmp_path: Path, apply_config: Config) -> None:
         """PSP script: --delete present, only 3 common excludes (no app-only patterns)."""
