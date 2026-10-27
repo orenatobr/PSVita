@@ -107,6 +107,21 @@ lftp ftp://192.168.1.196:1337 -e "
 
 After syncing new titles, open VitaShell > Triangle > Refresh livearea for them to appear on the home screen.
 
+## VitaShell FTP troubleshooting
+
+`sync-app` and `sync-psp` check that the FTP server answers (`220` banner) before starting `lftp`, and stop with a hint if it does not. If you see that error, press SELECT in VitaShell to stop and start the FTP server, then retry.
+
+Why the server hangs, from reading its source (`xerpi/ftpvita`):
+
+- **A dropped upload deletes the partial file.** When the data connection fails mid-STOR, the server removes the file and answers `426`. A reconnect therefore restarts from zero; resume never has data to continue.
+- **An aborted connection leaks a thread.** After `PASV` the server blocks in `accept` with no timeout. A client that disappears first (curl `--max-time`, `kill`, Wi-Fi drop) leaves that thread, and its sockets, stuck. Enough of them and the server still accepts TCP but stops sending the banner.
+
+Rules that follow:
+
+- Do not poll the server (`curl` listings, size checks) while a transfer runs. Watch progress locally instead, for example `nettop -p $(pgrep -x lftp) -L 1`.
+- Do not kill `lftp` mid-transfer. Let it finish or restart the FTP server afterwards.
+- For large files (about 500 MB and up, such as PSP ISOs) prefer the microSD card or VitaShell USB mode. The Vita Wi-Fi measured about 0.7 MiB/s here.
+
 ## Development
 
 ```bash

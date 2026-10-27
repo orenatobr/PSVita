@@ -114,3 +114,9 @@ sync:
     - "set ftp:use-site-utime false"
     - "set ftp:list-empty-ok true"
     - "set mirror:parallel-transfer-count 1"
+    # VitaShell deletes a partially received file when the data connection drops, so a
+    # reconnect always restarts from zero. Fail fast on a dead link instead of the 300 s
+    # default timeout, and give up after a few retries rather than looping forever.
+    - "set net:timeout 30"
+    - "set net:max-retries 3"
+    - "set net:reconnect-interval-base 10"
