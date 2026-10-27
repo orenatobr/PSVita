@@ -13,6 +13,7 @@ Requirements: lftp in PATH, VitaShell running on device.
 from __future__ import annotations
 
 import argparse
+import socket
 import subprocess
 import sys
 from pathlib import Path
@@ -55,6 +56,44 @@ def _lftp_script(
     parts.append(" ".join(mirror_flags))
     parts.append("quit")
     return "; ".join(parts)
+
+
+def ftp_ready(host: str, port: int, timeout: float = 5.0) -> bool:
+    """Check that the VitaShell FTP server answers with its ``220`` banner.
+
+    A wedged VitaShell still accepts the TCP connection but never sends a banner
+    (its client threads leak after aborted connections), which makes ``lftp`` hang
+    for minutes. Probing the banner first lets the sync fail fast instead.
+
+    Args:
+        host: IP address of the device.
+        port: FTP port of the device (VitaShell default is 1337).
+        timeout: Seconds to wait for the connection and the banner.
+
+    Returns:
+        ``True`` if the server replied with a ``220`` greeting, ``False`` otherwise.
+    """
+    try:
+        with socket.create_connection((host, port), timeout=timeout) as sock:
+            sock.settimeout(timeout)
+            return sock.recv(64).startswith(b"220")
+    except OSError:  # includes ConnectionRefusedError and socket.timeout
+        return False
+
+
+def _require_ftp(host: str, port: int) -> None:
+    """Exit with a hint when the Vita FTP server does not answer.
+
+    Args:
+        host: IP address of the device.
+        port: FTP port of the device.
+    """
+    if ftp_ready(host, port):
+        return
+    print(f"[ERROR] The FTP server at {host}:{port} is not answering.")
+    print("  In VitaShell, press SELECT to stop and start the FTP server again")
+    print("  (or close and reopen VitaShell), then retry.")
+    sys.exit(1)
 
 
 def _run_lftp(vita_ftp_url: str, script: str) -> None:
@@ -122,6 +161,7 @@ def main_app() -> None:
     vita_ftp_url = f"ftp://{cfg.vita.ip}:{cfg.vita.port}"
     app_local = cfg.paths.app_local
     label = "[DRY RUN] " if args.dry_run else ""
+    _require_ftp(cfg.vita.ip, cfg.vita.port)
     print(f"{label}Syncing {app_local} -> {vita_ftp_url}{cfg.sync.app_remote} ...")
     try:
         sync_app(app_local, vita_ftp_url, dry_run=args.dry_run)
@@ -144,6 +184,7 @@ def main_psp() -> None:
     vita_ftp_url = f"ftp://{cfg.vita.ip}:{cfg.vita.port}"
     psp_local = cfg.paths.psp_local
     label = "[DRY RUN] " if args.dry_run else ""
+    _require_ftp(cfg.vita.ip, cfg.vita.port)
     print(f"{label}Syncing {psp_local} -> {vita_ftp_url}{cfg.sync.psp_remote} ...")
     try:
         sync_psp(psp_local, vita_ftp_url, dry_run=args.dry_run)

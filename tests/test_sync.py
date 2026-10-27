@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import socket
 import subprocess
+from collections.abc import Iterator
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -144,7 +146,73 @@ class TestSyncFunctions:
 # ---------------------------------------------------------------------------
 
 
+class TestFtpReady:
+    """ftp_ready: fail fast when VitaShell accepts TCP but never sends its banner."""
+
+    @staticmethod
+    def _conn(banner: bytes) -> MagicMock:
+        sock = MagicMock()
+        sock.recv.return_value = banner
+        conn = MagicMock()
+        conn.__enter__.return_value = sock
+        return conn
+
+    def test_banner_220_is_ready(self) -> None:
+        with patch("psvita.sync.socket.create_connection", return_value=self._conn(b"220 FTPVita ready\r\n")):
+            assert s.ftp_ready("127.0.0.1", 1337) is True
+
+    def test_connection_refused_is_not_ready(self) -> None:
+        with patch("psvita.sync.socket.create_connection", side_effect=ConnectionRefusedError):
+            assert s.ftp_ready("127.0.0.1", 1337) is False
+
+    def test_no_banner_timeout_is_not_ready(self) -> None:
+        """TCP accepted but no banner: the wedged-server symptom."""
+        sock = MagicMock()
+        sock.recv.side_effect = socket.timeout
+        conn = MagicMock()
+        conn.__enter__.return_value = sock
+        with patch("psvita.sync.socket.create_connection", return_value=conn):
+            assert s.ftp_ready("127.0.0.1", 1337) is False
+
+    def test_unexpected_banner_is_not_ready(self) -> None:
+        with patch("psvita.sync.socket.create_connection", return_value=self._conn(b"421 busy\r\n")):
+            assert s.ftp_ready("127.0.0.1", 1337) is False
+
+    def test_empty_banner_is_not_ready(self) -> None:
+        with patch("psvita.sync.socket.create_connection", return_value=self._conn(b"")):
+            assert s.ftp_ready("127.0.0.1", 1337) is False
+
+
+class TestMainPreflight:
+    """main_app/main_psp stop before lftp when the FTP server does not answer."""
+
+    @pytest.mark.parametrize("entry", ["main_app", "main_psp"])
+    def test_exits_without_running_lftp(
+        self,
+        entry: str,
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
+        apply_config: Config,
+    ) -> None:
+        monkeypatch.setattr("sys.argv", ["sync"])
+        with (
+            patch("psvita.sync.ftp_ready", return_value=False),
+            patch("psvita.sync._run_lftp") as mock_run,
+            pytest.raises(SystemExit) as exc,
+        ):
+            getattr(s, entry)()
+        assert exc.value.code == 1
+        mock_run.assert_not_called()
+        assert "VitaShell" in capsys.readouterr().out
+
+
 class TestMain:
+    @pytest.fixture(autouse=True)
+    def _vita_ftp_up(self) -> Iterator[None]:
+        """Pretend the Vita FTP server answers so main() reaches lftp."""
+        with patch("psvita.sync.ftp_ready", return_value=True):
+            yield
+
     def test_main_app_default(
         self,
         monkeypatch: pytest.MonkeyPatch,
